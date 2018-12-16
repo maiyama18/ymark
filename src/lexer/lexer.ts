@@ -1,4 +1,4 @@
-import {Token} from '../token/token';
+import {Token, TokenType} from '../token/token';
 
 export class Lexer {
   public input: string;
@@ -15,9 +15,13 @@ export class Lexer {
 
   public nextToken(): Token {
     if (this.processNewlines()) { return new Token('NEWLINE', '\n\n'); }
+    this.skipSpaces();
 
     let token;
     switch (this.char) {
+      case '#':
+        token = this.readHashes();
+        break;
       case '':
         token = new Token('EOF', '');
         break;
@@ -62,6 +66,12 @@ export class Lexer {
     return true;
   }
 
+  private skipSpaces() {
+    while (this.char === ' ' || this.char === '\t') {
+      this.consumeChar();
+    }
+  }
+
   private readText(): Token {
     const start = this.currentPosition;
     while (this.peekPosition < this.input.length && !this.isPeekSymbol()) {
@@ -69,6 +79,46 @@ export class Lexer {
     }
 
     return new Token('TEXT', this.input.substring(start, this.peekPosition));
+  }
+
+  // return hashes token if spaces exist after successive #s
+  private readHashes(): Token {
+    let count = 1;
+    while (this.peekChar() === '#') {
+      this.consumeChar();
+      count += 1;
+    }
+
+    let tokenType: TokenType;
+    let literal;
+    switch (count) {
+      case 1:
+        tokenType = 'HASH1';
+        literal = '#';
+        break;
+      case 2:
+        tokenType = 'HASH2';
+        literal = '##';
+        break;
+      case 3:
+        tokenType = 'HASH3';
+        literal = '###';
+        break;
+      case 4:
+        tokenType = 'HASH4';
+        literal = '####';
+        break;
+      case 5:
+        tokenType = 'HASH5';
+        literal = '#####';
+        break;
+      default:
+        tokenType = 'HASH6';
+        literal = '######';
+        break;
+    }
+
+    return new Token(tokenType, literal);
   }
 
   private isPeekSymbol(): boolean {

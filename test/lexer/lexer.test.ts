@@ -72,6 +72,44 @@ second line.
       testLexer(input, expected);
     });
   });
+
+  describe('hashes', () => {
+    it('should lex hashes', () => {
+      const input = `
+# ## ###
+#### ##### ######
+`;
+      const expected = [
+        new Token('HASH1', '#'),
+        new Token('HASH2', '##'),
+        new Token('HASH3', '###'),
+        new Token('HASH4', '####'),
+        new Token('HASH5', '#####'),
+        new Token('HASH6', '######'),
+        new Token('EOF', ''),
+      ];
+
+      testLexer(input, expected);
+    });
+
+    it('should lex header', () => {
+      const input = `
+# this is header
+
+## this is header2
+`;
+      const expected = [
+        new Token('HASH1', '#'),
+        new Token('TEXT', 'this is header'),
+        new Token('NEWLINE', '\n\n'),
+        new Token('HASH2', '##'),
+        new Token('TEXT', 'this is header2'),
+        new Token('EOF', ''),
+      ];
+
+      testLexer(input, expected);
+    });
+  });
 });
 
 const testLexer = (input: string, expected: Token[]) => {
