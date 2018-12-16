@@ -19,6 +19,18 @@ export class Lexer {
 
     let token;
     switch (this.char) {
+      case '[':
+        token = new Token('LBRACKET', '[');
+        break;
+      case ']':
+        token = new Token('RBRACKET', ']');
+        break;
+      case '(':
+        token = new Token('LPAREN', '(');
+        break;
+      case ')':
+        token = new Token('RPAREN', ')');
+        break;
       case '#':
         token = this.readHashes();
         break;
@@ -123,6 +135,11 @@ export class Lexer {
 
   private isPeekSymbol(): boolean {
     const peekChar = this.input[this.peekPosition];
-    return peekChar === '\n';
+    const symbols = ['\n', '[', ']', '(', ')'];
+
+    for (const symbol of symbols) {
+      if (symbol === peekChar) { return true; }
+    }
+    return false;
   }
 }
