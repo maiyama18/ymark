@@ -1,4 +1,14 @@
-export type Node = Line | Inline;
+export type Node = Document | Line | Inline;
+
+// Document node
+export class Document {
+  public readonly nodeType = 'DOCUMENT';
+  public lines: Line[];
+
+  constructor(lines?: Line[]) {
+    this.lines = lines || [];
+  }
+}
 
 // Line nodes
 export type Line = Paragraph | Header;
