@@ -1,5 +1,5 @@
-import {Lexer} from '../../src/lexer/lexer';
-import {Token} from '../../src/token/token';
+import { Lexer } from '../../src/lexer/lexer';
+import { Token } from '../../src/token/token';
 
 describe('lexer', () => {
   describe('simple cases', () => {
