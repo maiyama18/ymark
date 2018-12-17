@@ -1,5 +1,4 @@
 import { Lexer } from '../../src/lexer/lexer';
-import { Document} from '../../src/node/node';
 import { Parser } from '../../src/parser/parser';
 import { Renderer } from '../../src/renderer/renderer';
 
