@@ -1,7 +1,7 @@
 {
-  "name": "hello-npm-ymr",
+  "name": "ymark",
   "version": "1.0.2",
-  "description": "my hello world package",
+  "description": "toy markdown interpreter",
   "main": "lib/index.js",
   "scripts": {
     "prepublish": "tsc",
