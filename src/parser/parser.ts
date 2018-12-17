@@ -1,5 +1,5 @@
 import { Lexer } from '../lexer/lexer';
-import { Document, Header, Inline, Line, Paragraph, Text } from '../node/node';
+import {Document, Header, Inline, Line, Link, Paragraph, Text} from '../node/node';
 import { Token, TokenType } from '../token/token';
 
 export class Parser {
@@ -33,6 +33,11 @@ export class Parser {
   private consumeToken(): void {
     this.currentToken = this.peekToken;
     this.peekToken = this.lexer.nextToken();
+  }
+
+  private expectPeekTokenType(tokenType: TokenType): boolean {
+    this.consumeToken();
+    return this.isCurrentTokenType(tokenType);
   }
 
   private isCurrentTokenType(tokenType: TokenType): boolean {
@@ -88,10 +93,38 @@ export class Parser {
 
   private parseInline(): Inline {
     switch (this.currentToken.tokenType) {
-      case 'TEXT':
+      case 'LBRACKET':
+        return this.parseLink();
+      default:
         return new Text(this.currentToken.literal);
     }
+  }
 
-    return new Text('');
+  private parseLink(): Inline {
+    let literal = '[';
+
+    this.consumeToken();
+    literal += this.currentToken.literal;
+    if (!this.isCurrentTokenType('TEXT')) { return new Text(literal); }
+    const text = this.currentToken.literal;
+
+    this.consumeToken();
+    literal += this.currentToken.literal;
+    if (!this.isCurrentTokenType('RBRACKET')) { return new Text(literal); }
+
+    this.consumeToken();
+    literal += this.currentToken.literal;
+    if (!this.isCurrentTokenType('LPAREN')) { return new Text(literal); }
+
+    this.consumeToken();
+    literal += this.currentToken.literal;
+    if (!this.isCurrentTokenType('TEXT')) { return new Text(literal); }
+    const href = this.currentToken.literal;
+
+    this.consumeToken();
+    literal += this.currentToken.literal;
+    if (!this.isCurrentTokenType('RPAREN')) { return new Text(literal); }
+
+    return new Link(text, href);
   }
 }
