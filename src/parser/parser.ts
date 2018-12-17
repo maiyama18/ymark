@@ -22,7 +22,6 @@ export class Parser {
 
     while (!this.isCurrentTokenType('EOF')) {
       const line = this.parseLine();
-      console.log(line);
       document.lines.push(line);
 
       this.consumeToken();
