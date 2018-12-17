@@ -35,17 +35,8 @@ export class Parser {
     this.peekToken = this.lexer.nextToken();
   }
 
-  private expectPeekTokenType(tokenType: TokenType): boolean {
-    this.consumeToken();
-    return this.isCurrentTokenType(tokenType);
-  }
-
   private isCurrentTokenType(tokenType: TokenType): boolean {
     return this.currentToken.tokenType === tokenType;
-  }
-
-  private isPeekTokenType(tokenType: TokenType): boolean {
-    return this.peekToken.tokenType === tokenType;
   }
 
   private parseLine(): Line {
