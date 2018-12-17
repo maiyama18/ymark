@@ -59,28 +59,8 @@ export class Parser {
   }
 
   private parseHeaderLine(): Header {
-    let numHashes;
-    switch (this.currentToken.tokenType) {
-      case 'HASH1':
-        numHashes = 1;
-        break;
-      case 'HASH2':
-        numHashes = 2;
-        break;
-      case 'HASH3':
-        numHashes = 3;
-        break;
-      case 'HASH4':
-        numHashes = 4;
-        break;
-      case 'HASH5':
-        numHashes = 5;
-        break;
-      default:
-        numHashes = 6;
-        break;
-    }
-
+    // this.currentToken.tokenType = HASH[1-6]
+    const numHashes = parseInt(this.currentToken.tokenType.slice(-1), 10);
     const header = new Header(numHashes);
 
     this.consumeToken();
