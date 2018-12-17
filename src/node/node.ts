@@ -43,6 +43,10 @@ export class Text {
   constructor(text?: string) {
     this.text = text || '';
   }
+
+  public html(): string {
+    return `<span>${this.text}</span>`;
+  }
 }
 
 export class Link {
@@ -53,5 +57,9 @@ export class Link {
   constructor(text?: string, href?: string) {
     this.text = text || '';
     this.href = href || '';
+  }
+
+  public html(): string {
+    return `<a href="${this.href}">${this.text}</a>`;
   }
 }
