@@ -19,3 +19,8 @@ and generate html document.
 ```html
 <div><h1>This is header</h1><p><span>Hello world. </span></span><a href="http://example.com">This is link</a><span>. Hahaha.</span></p><p><span>Give me money.<span></p></div>
 ```
+
+## Todo
+
+- リンクの後の空白を読み飛ばさないようにする
+- 箇条書きに対応
