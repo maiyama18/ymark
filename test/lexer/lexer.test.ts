@@ -1,6 +1,17 @@
 import { Lexer } from '../../src/lexer/lexer';
 import { Token } from '../../src/token/token';
 
+const testLex = (input: string, expected: Token[]): void => {
+    const lexer = new Lexer(input);
+
+    const actual = [];
+    for (let i = 0; i < expected.length; i++) {
+        actual.push(lexer.nextToken());
+    }
+
+    expect(actual).toEqual(expected);
+};
+
 describe('lexer', () => {
     describe('simple cases', () => {
         it('should lex empty input', () => {
@@ -9,7 +20,7 @@ describe('lexer', () => {
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
 
         it('should lex text only input', () => {
@@ -19,7 +30,7 @@ describe('lexer', () => {
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
     });
 
@@ -34,7 +45,7 @@ second line.`;
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
 
         it('should lex two successive newlines', () => {
@@ -49,7 +60,7 @@ second line.`;
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
     });
 
@@ -72,7 +83,7 @@ second line.`;
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
 
         it('should lex header', () => {
@@ -87,7 +98,7 @@ second line.`;
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
     });
 
@@ -102,7 +113,7 @@ second line.`;
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
 
         it('should lex mix of texts and symbols', () => {
@@ -124,7 +135,7 @@ hello [this is link](http://example.com)`;
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
     });
 
@@ -151,7 +162,7 @@ good bye`;
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
 
         it('should lex minus during line', () => {
@@ -163,18 +174,7 @@ good bye`;
                 new Token('EOF', ''),
             ];
 
-            testLexer(input, expected);
+            testLex(input, expected);
         });
     });
 });
-
-const testLexer = (input: string, expected: Token[]) => {
-    const lexer = new Lexer(input);
-
-    const actual = [];
-    for (let i = 0; i < expected.length; i++) {
-        actual.push(lexer.nextToken());
-    }
-
-    expect(actual).toEqual(expected);
-};
