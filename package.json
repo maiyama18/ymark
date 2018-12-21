@@ -1,6 +1,6 @@
 {
   "name": "ymark",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "toy markdown interpreter",
   "main": "lib/index.js",
   "scripts": {

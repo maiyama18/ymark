@@ -22,16 +22,23 @@ export class Renderer {
             content += inline.html();
         }
 
-        let wrapper;
+        let preTag;
+        let postTag;
         switch (line.nodeType) {
             case 'HEADER':
-                wrapper = `h${line.numHashes}`;
+                preTag = `<h${line.numHashes}>`;
+                postTag = `</h${line.numHashes}>`;
                 break;
-            default:
-                wrapper = `p`;
+            case 'LIST':
+                preTag = `${line.isFirst ? '<ul><li>' : '<li>'}`;
+                postTag = `${line.isLast ? '</li></ul>' : '</li>'}`;
+                break;
+            default: // PARAGRAPH
+                preTag = `<p>`;
+                postTag = `</p>`;
                 break;
         }
 
-        return `<${wrapper}>${content}</${wrapper}>`;
+        return `${preTag}${content}${postTag}`;
     }
 }

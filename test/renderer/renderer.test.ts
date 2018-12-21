@@ -31,6 +31,13 @@ describe('renderer', () => {
 
             expect(html).toBe('<div><h3><span>hello</span></h3></div>');
         });
+
+        it('should render document consists of list', () => {
+            const input = '- item';
+            const html = renderHTML(input);
+
+            expect(html).toBe('<div><ul><li><span>item</span></li></ul></div>');
+        });
     });
 
     describe('more realistic cases', () => {
@@ -39,6 +46,10 @@ describe('renderer', () => {
 
 this is paragraph. link is [here](http://example.com).
 
+- item1
+- item2
+- item3
+
 #### header2`;
             const html = renderHTML(input);
 
@@ -46,6 +57,10 @@ this is paragraph. link is [here](http://example.com).
                 '<div><h2><span>header</span></h2>' +
                 '<p></p>' +
                 '<p><span>this is paragraph. link is </span><a href="http://example.com">here</a><span>.</span></p>' +
+                '<p></p>' +
+                '<ul><li><span>item1</span></li>' +
+                '<li><span>item2</span></li>' +
+                '<li><span>item3</span></li></ul>' +
                 '<p></p>' +
                 '<h4><span>header2</span></h4></div>');
         });
