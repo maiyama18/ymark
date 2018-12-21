@@ -15,7 +15,7 @@ describe('lexer', () => {
         it('should lex text only input', () => {
             const input = 'this is text.';
             const expected = [
-                new Token('TEXT', 'this is text.'),
+                new Token('LETTERS', 'this is text.'),
                 new Token('EOF', ''),
             ];
 
@@ -24,14 +24,13 @@ describe('lexer', () => {
     });
 
     describe('newlines', () => {
-        it('should skip single newline', () => {
-            const input = `
-first line.
-second line.
-`;
+        it('should lex single newline', () => {
+            const input = `first line.
+second line.`;
             const expected = [
-                new Token('TEXT', 'first line.'),
-                new Token('TEXT', 'second line.'),
+                new Token('LETTERS', 'first line.'),
+                new Token('NEWLINE', '\n'),
+                new Token('LETTERS', 'second line.'),
                 new Token('EOF', ''),
             ];
 
@@ -39,33 +38,14 @@ second line.
         });
 
         it('should lex two successive newlines', () => {
-            const input = `
-first line.
+            const input = `first line.
 
-second line.
-`;
+second line.`;
             const expected = [
-                new Token('TEXT', 'first line.'),
-                new Token('NEWLINE', '\n\n'),
-                new Token('TEXT', 'second line.'),
-                new Token('EOF', ''),
-            ];
-
-            testLexer(input, expected);
-        });
-
-        it('should lex more than two successive newlines', () => {
-            const input = `
-first line.
-
-
-
-second line.
-`;
-            const expected = [
-                new Token('TEXT', 'first line.'),
-                new Token('NEWLINE', '\n\n'),
-                new Token('TEXT', 'second line.'),
+                new Token('LETTERS', 'first line.'),
+                new Token('NEWLINE', '\n'),
+                new Token('NEWLINE', '\n'),
+                new Token('LETTERS', 'second line.'),
                 new Token('EOF', ''),
             ];
 
@@ -75,16 +55,19 @@ second line.
 
     describe('hashes', () => {
         it('should lex hashes', () => {
-            const input = `
-# ## ###
-#### ##### ######
-`;
+            const input = `# ## ###
+#### ##### ######`;
             const expected = [
                 new Token('HASHES1', '#'),
+                new Token('LETTERS', ' '),
                 new Token('HASHES2', '##'),
+                new Token('LETTERS', ' '),
                 new Token('HASHES3', '###'),
+                new Token('NEWLINE', '\n'),
                 new Token('HASHES4', '####'),
+                new Token('LETTERS', ' '),
                 new Token('HASHES5', '#####'),
+                new Token('LETTERS', ' '),
                 new Token('HASHES6', '######'),
                 new Token('EOF', ''),
             ];
@@ -93,17 +76,14 @@ second line.
         });
 
         it('should lex header', () => {
-            const input = `
-# this is header
-
-## this is header2
-`;
+            const input = `# this is header
+## this is header2`;
             const expected = [
                 new Token('HASHES1', '#'),
-                new Token('TEXT', 'this is header'),
-                new Token('NEWLINE', '\n\n'),
+                new Token('LETTERS', ' this is header'),
+                new Token('NEWLINE', '\n'),
                 new Token('HASHES2', '##'),
-                new Token('TEXT', 'this is header2'),
+                new Token('LETTERS', ' this is header2'),
                 new Token('EOF', ''),
             ];
 
@@ -126,21 +106,20 @@ second line.
         });
 
         it('should lex mix of texts and symbols', () => {
-            const input = `
-## header
+            const input = `## header
 
-hello [this is link](http://example.com)
-`;
+hello [this is link](http://example.com)`;
             const expected = [
                 new Token('HASHES2', '##'),
-                new Token('TEXT', 'header'),
-                new Token('NEWLINE', '\n\n'),
-                new Token('TEXT', 'hello '),
+                new Token('LETTERS', ' header'),
+                new Token('NEWLINE', '\n'),
+                new Token('NEWLINE', '\n'),
+                new Token('LETTERS', 'hello '),
                 new Token('LBRACKET', '['),
-                new Token('TEXT', 'this is link'),
+                new Token('LETTERS', 'this is link'),
                 new Token('RBRACKET', ']'),
                 new Token('LPAREN', '('),
-                new Token('TEXT', 'http://example.com'),
+                new Token('LETTERS', 'http://example.com'),
                 new Token('RPAREN', ')'),
                 new Token('EOF', ''),
             ];
@@ -151,23 +130,23 @@ hello [this is link](http://example.com)
 
     describe('list', () => {
         it('should lex list', () => {
-            const input = `
-hello
+            const input = `hello
 
 - first
 - second
 
-good bye
-      `;
+good bye`;
             const expected = [
-                new Token('TEXT', 'hello'),
-                new Token('NEWLINE', '\n\n'),
+                new Token('LETTERS', 'hello'),
+                new Token('NEWLINE', '\n'),
+                new Token('NEWLINE', '\n'),
                 new Token('MINUS', '-'),
-                new Token('TEXT', 'first'),
+                new Token('LETTERS', ' first'),
                 new Token('MINUS', '-'),
-                new Token('TEXT', 'second'),
-                new Token('NEWLINE', '\n\n'),
-                new Token('TEXT', 'good bye'),
+                new Token('LETTERS', ' second'),
+                new Token('NEWLINE', '\n'),
+                new Token('NEWLINE', '\n'),
+                new Token('LETTERS', 'good bye'),
                 new Token('EOF', ''),
             ];
 
@@ -177,9 +156,9 @@ good bye
         it('should lex minus during line', () => {
             const input = `3 - 2`;
             const expected = [
-                new Token('TEXT', '3 '),
+                new Token('LETTERS', '3 '),
                 new Token('MINUS', '-'),
-                new Token('TEXT', '2'),
+                new Token('LETTERS', ' 2'),
                 new Token('EOF', ''),
             ];
 

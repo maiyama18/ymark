@@ -1,5 +1,5 @@
 export type TokenType =
-    | 'TEXT'
+    | 'LETTERS'
     | 'LBRACKET'
     | 'RBRACKET'
     | 'LPAREN'

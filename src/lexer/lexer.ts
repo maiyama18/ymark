@@ -14,11 +14,6 @@ export class Lexer {
     }
 
     public nextToken(): Token {
-        if (this.processNewlines()) {
-            return new Token('NEWLINE', '\n\n');
-        }
-        this.skipSpaces();
-
         let token;
         switch (this.char) {
             case '[':
@@ -39,11 +34,14 @@ export class Lexer {
             case '#':
                 token = this.readHashes();
                 break;
+            case '\n':
+                token = new Token('NEWLINE', '\n');
+                break;
             case '':
                 token = new Token('EOF', '');
                 break;
             default:
-                token = this.readText();
+                token = this.readLetters();
                 break;
         }
 
@@ -66,38 +64,13 @@ export class Lexer {
         return this.peekPosition >= this.input.length ? '' : this.input[this.peekPosition];
     }
 
-    // skip single newline.
-    // return true if there is successive newlines.
-    private processNewlines() {
-        if (this.char !== '\n') {
-            return;
-        }
-
-        if (this.peekChar() !== '\n') {
-            this.consumeChar();
-            return false;
-        }
-
-        while (this.peekChar() === '\n') {
-            this.consumeChar();
-        }
-        this.consumeChar();
-        return true;
-    }
-
-    private skipSpaces() {
-        while (this.char === ' ' || this.char === '\t') {
-            this.consumeChar();
-        }
-    }
-
-    private readText(): Token {
+    private readLetters(): Token {
         const start = this.currentPosition;
-        while (this.peekPosition < this.input.length && !this.isPeekSymbol()) {
+        while (this.peekPosition < this.input.length && this.isPeekCharLetter()) {
             this.consumeChar();
         }
 
-        return new Token('TEXT', this.input.substring(start, this.peekPosition));
+        return new Token('LETTERS', this.input.substring(start, this.peekPosition));
     }
 
     // return hashes token if spaces exist after successive #s
@@ -140,15 +113,15 @@ export class Lexer {
         return new Token(tokenType, literal);
     }
 
-    private isPeekSymbol(): boolean {
+    private isPeekCharLetter(): boolean {
         const peekChar = this.input[this.peekPosition];
-        const symbols = ['\n', '[', ']', '(', ')', '-'];
+        const symbols = ['\n', '[', ']', '(', ')', '-', '#'];
 
         for (const symbol of symbols) {
             if (symbol === peekChar) {
-                return true;
+                return false;
             }
         }
-        return false;
+        return true;
     }
 }
