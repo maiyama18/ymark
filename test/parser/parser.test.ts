@@ -95,6 +95,24 @@ paragraph
             expect(inlines.length).toBe(1);
             expect(inlines[0].text).toBe('## header ##');
         });
+
+        it('should parse header including link', () => {
+            const input = `# text1 [link](http://example.com) text2`;
+            const document = parseDocument(input);
+
+            expect(document.lines.length).toBe(1);
+
+            const header = document.lines[0] as Header;
+            expect(header.numHashes).toBe(1);
+
+            const inlines = header.inlines;
+            expect(inlines.length).toBe(3);
+            expect(inlines[0].text).toBe('text1 ');
+            expect(inlines[2].text).toBe(' text2');
+            const link = inlines[1] as Link;
+            expect(link.text).toBe('link');
+            expect(link.href).toBe('http://example.com');
+        });
     });
 
     describe('paragraph', () => {
