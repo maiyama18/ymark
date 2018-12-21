@@ -2,161 +2,199 @@ import { Lexer } from '../../src/lexer/lexer';
 import { Token } from '../../src/token/token';
 
 describe('lexer', () => {
-  describe('simple cases', () => {
-    it('should lex empty input', () => {
-      const input = '';
-      const expected = [
-        new Token('EOF', ''),
-      ];
+    describe('simple cases', () => {
+        it('should lex empty input', () => {
+            const input = '';
+            const expected = [
+                new Token('EOF', ''),
+            ];
 
-      testLexer(input, expected);
+            testLexer(input, expected);
+        });
+
+        it('should lex text only input', () => {
+            const input = 'this is text.';
+            const expected = [
+                new Token('TEXT', 'this is text.'),
+                new Token('EOF', ''),
+            ];
+
+            testLexer(input, expected);
+        });
     });
 
-    it('should lex text only input', () => {
-      const input = 'this is text.';
-      const expected = [
-        new Token('TEXT', 'this is text.'),
-        new Token('EOF', ''),
-      ];
-
-      testLexer(input, expected);
-    });
-  });
-
-  describe('newlines', () => {
-    it('should skip single newline', () => {
-      const input = `
+    describe('newlines', () => {
+        it('should skip single newline', () => {
+            const input = `
 first line.
 second line.
 `;
-      const expected = [
-        new Token('TEXT', 'first line.'),
-        new Token('TEXT', 'second line.'),
-        new Token('EOF', ''),
-      ];
+            const expected = [
+                new Token('TEXT', 'first line.'),
+                new Token('TEXT', 'second line.'),
+                new Token('EOF', ''),
+            ];
 
-      testLexer(input, expected);
-    });
+            testLexer(input, expected);
+        });
 
-    it('should lex two successive newlines', () => {
-      const input = `
+        it('should lex two successive newlines', () => {
+            const input = `
 first line.
 
 second line.
 `;
-      const expected = [
-        new Token('TEXT', 'first line.'),
-        new Token('NEWLINE', '\n\n'),
-        new Token('TEXT', 'second line.'),
-        new Token('EOF', ''),
-      ];
+            const expected = [
+                new Token('TEXT', 'first line.'),
+                new Token('NEWLINE', '\n\n'),
+                new Token('TEXT', 'second line.'),
+                new Token('EOF', ''),
+            ];
 
-      testLexer(input, expected);
-    });
+            testLexer(input, expected);
+        });
 
-    it('should lex more than two successive newlines', () => {
-      const input = `
+        it('should lex more than two successive newlines', () => {
+            const input = `
 first line.
 
 
 
 second line.
 `;
-      const expected = [
-        new Token('TEXT', 'first line.'),
-        new Token('NEWLINE', '\n\n'),
-        new Token('TEXT', 'second line.'),
-        new Token('EOF', ''),
-      ];
+            const expected = [
+                new Token('TEXT', 'first line.'),
+                new Token('NEWLINE', '\n\n'),
+                new Token('TEXT', 'second line.'),
+                new Token('EOF', ''),
+            ];
 
-      testLexer(input, expected);
+            testLexer(input, expected);
+        });
     });
-  });
 
-  describe('hashes', () => {
-    it('should lex hashes', () => {
-      const input = `
+    describe('hashes', () => {
+        it('should lex hashes', () => {
+            const input = `
 # ## ###
 #### ##### ######
 `;
-      const expected = [
-        new Token('HASH1', '#'),
-        new Token('HASH2', '##'),
-        new Token('HASH3', '###'),
-        new Token('HASH4', '####'),
-        new Token('HASH5', '#####'),
-        new Token('HASH6', '######'),
-        new Token('EOF', ''),
-      ];
+            const expected = [
+                new Token('HASHES1', '#'),
+                new Token('HASHES2', '##'),
+                new Token('HASHES3', '###'),
+                new Token('HASHES4', '####'),
+                new Token('HASHES5', '#####'),
+                new Token('HASHES6', '######'),
+                new Token('EOF', ''),
+            ];
 
-      testLexer(input, expected);
-    });
+            testLexer(input, expected);
+        });
 
-    it('should lex header', () => {
-      const input = `
+        it('should lex header', () => {
+            const input = `
 # this is header
 
 ## this is header2
 `;
-      const expected = [
-        new Token('HASH1', '#'),
-        new Token('TEXT', 'this is header'),
-        new Token('NEWLINE', '\n\n'),
-        new Token('HASH2', '##'),
-        new Token('TEXT', 'this is header2'),
-        new Token('EOF', ''),
-      ];
+            const expected = [
+                new Token('HASHES1', '#'),
+                new Token('TEXT', 'this is header'),
+                new Token('NEWLINE', '\n\n'),
+                new Token('HASHES2', '##'),
+                new Token('TEXT', 'this is header2'),
+                new Token('EOF', ''),
+            ];
 
-      testLexer(input, expected);
-    });
-  });
-
-  describe('symbols', () => {
-    it('should lex symbols consist of single char', () => {
-      const input = `[]()`;
-      const expected = [
-        new Token('LBRACKET', '['),
-        new Token('RBRACKET', ']'),
-        new Token('LPAREN', '('),
-        new Token('RPAREN', ')'),
-        new Token('EOF', ''),
-      ];
-
-      testLexer(input, expected);
+            testLexer(input, expected);
+        });
     });
 
-    it('should lex mix of texts and symbols', () => {
-      const input = `
+    describe('symbols', () => {
+        it('should lex symbols consist of single char', () => {
+            const input = `[]()`;
+            const expected = [
+                new Token('LBRACKET', '['),
+                new Token('RBRACKET', ']'),
+                new Token('LPAREN', '('),
+                new Token('RPAREN', ')'),
+                new Token('EOF', ''),
+            ];
+
+            testLexer(input, expected);
+        });
+
+        it('should lex mix of texts and symbols', () => {
+            const input = `
 ## header
 
 hello [this is link](http://example.com)
 `;
-      const expected = [
-        new Token('HASH2', '##'),
-        new Token('TEXT', 'header'),
-        new Token('NEWLINE', '\n\n'),
-        new Token('TEXT', 'hello '),
-        new Token('LBRACKET', '['),
-        new Token('TEXT', 'this is link'),
-        new Token('RBRACKET', ']'),
-        new Token('LPAREN', '('),
-        new Token('TEXT', 'http://example.com'),
-        new Token('RPAREN', ')'),
-        new Token('EOF', ''),
-      ];
+            const expected = [
+                new Token('HASHES2', '##'),
+                new Token('TEXT', 'header'),
+                new Token('NEWLINE', '\n\n'),
+                new Token('TEXT', 'hello '),
+                new Token('LBRACKET', '['),
+                new Token('TEXT', 'this is link'),
+                new Token('RBRACKET', ']'),
+                new Token('LPAREN', '('),
+                new Token('TEXT', 'http://example.com'),
+                new Token('RPAREN', ')'),
+                new Token('EOF', ''),
+            ];
 
-      testLexer(input, expected);
+            testLexer(input, expected);
+        });
     });
-  });
+
+    describe('list', () => {
+        it('should lex list', () => {
+            const input = `
+hello
+
+- first
+- second
+
+good bye
+      `;
+            const expected = [
+                new Token('TEXT', 'hello'),
+                new Token('NEWLINE', '\n\n'),
+                new Token('MINUS', '-'),
+                new Token('TEXT', 'first'),
+                new Token('MINUS', '-'),
+                new Token('TEXT', 'second'),
+                new Token('NEWLINE', '\n\n'),
+                new Token('TEXT', 'good bye'),
+                new Token('EOF', ''),
+            ];
+
+            testLexer(input, expected);
+        });
+
+        it('should lex minus during line', () => {
+            const input = `3 - 2`;
+            const expected = [
+                new Token('TEXT', '3 '),
+                new Token('MINUS', '-'),
+                new Token('TEXT', '2'),
+                new Token('EOF', ''),
+            ];
+
+            testLexer(input, expected);
+        });
+    });
 });
 
 const testLexer = (input: string, expected: Token[]) => {
-  const lexer = new Lexer(input);
+    const lexer = new Lexer(input);
 
-  const actual = [];
-  for (let i = 0; i < expected.length; i++) {
-    actual.push(lexer.nextToken());
-  }
+    const actual = [];
+    for (let i = 0; i < expected.length; i++) {
+        actual.push(lexer.nextToken());
+    }
 
-  expect(actual).toEqual(expected);
+    expect(actual).toEqual(expected);
 };

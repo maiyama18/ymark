@@ -1,37 +1,37 @@
 import { Document, Line } from '../node/node';
 
 export class Renderer {
-  public document: Document;
+    public document: Document;
 
-  constructor(document: Document) {
-    this.document = document;
-  }
-
-  public renderHTML(): string {
-    let content = '';
-    for (const line of this.document.lines) {
-      content += this.renderLine(line);
+    constructor(document: Document) {
+        this.document = document;
     }
 
-    return `<div>${content}</div>`;
-  }
+    public renderHTML(): string {
+        let content = '';
+        for (const line of this.document.lines) {
+            content += this.renderLine(line);
+        }
 
-  private renderLine(line: Line): string {
-    let content = '';
-    for (const inline of line.inlines) {
-      content += inline.html();
+        return `<div>${content}</div>`;
     }
 
-    let wrapper;
-    switch (line.nodeType) {
-      case 'HEADER':
-        wrapper = `h${line.numHashes}`;
-        break;
-      default:
-        wrapper = `p`;
-        break;
-    }
+    private renderLine(line: Line): string {
+        let content = '';
+        for (const inline of line.inlines) {
+            content += inline.html();
+        }
 
-    return `<${wrapper}>${content}</${wrapper}>`;
-  }
+        let wrapper;
+        switch (line.nodeType) {
+            case 'HEADER':
+                wrapper = `h${line.numHashes}`;
+                break;
+            default:
+                wrapper = `p`;
+                break;
+        }
+
+        return `<${wrapper}>${content}</${wrapper}>`;
+    }
 }

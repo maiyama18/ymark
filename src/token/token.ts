@@ -1,25 +1,25 @@
 export type TokenType =
-  | 'TEXT'
-  | 'LBRACKET'
-  | 'RBRACKET'
-  | 'LPAREN'
-  | 'RPAREN'
-  | 'HASH1'
-  | 'HASH2'
-  | 'HASH3'
-  | 'HASH4'
-  | 'HASH5'
-  | 'HASH6'
-  | 'NEWLINE'
-  | 'EOF'
-  | 'ILLEGAL';
+    | 'TEXT'
+    | 'LBRACKET'
+    | 'RBRACKET'
+    | 'LPAREN'
+    | 'RPAREN'
+    | 'MINUS'
+    | 'HASHES1'
+    | 'HASHES2'
+    | 'HASHES3'
+    | 'HASHES4'
+    | 'HASHES5'
+    | 'HASHES6'
+    | 'NEWLINE'
+    | 'EOF';
 
 export class Token {
-  public tokenType: TokenType;
-  public literal: string;
+    public tokenType: TokenType;
+    public literal: string;
 
-  constructor(tokenType: TokenType, literal: string) {
-    this.tokenType = tokenType;
-    this.literal = literal;
-  }
+    constructor(tokenType: TokenType, literal: string) {
+        this.tokenType = tokenType;
+        this.literal = literal;
+    }
 }
