@@ -35,18 +35,18 @@ describe('renderer', () => {
 
     describe('more realistic cases', () => {
         it('should render document consists of header and paragraph with link', () => {
-            const input = `
-## header
+            const input = `## header
 
 this is paragraph. link is [here](http://example.com).
 
-#### header2
-`;
+#### header2`;
             const html = renderHTML(input);
 
             expect(html).toBe(
                 '<div><h2><span>header</span></h2>' +
+                '<p></p>' +
                 '<p><span>this is paragraph. link is </span><a href="http://example.com">here</a><span>.</span></p>' +
+                '<p></p>' +
                 '<h4><span>header2</span></h4></div>');
         });
     });
