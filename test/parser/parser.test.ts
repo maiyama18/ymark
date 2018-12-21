@@ -1,5 +1,5 @@
 import { Lexer } from '../../src/lexer/lexer';
-import { Document, Header, Link, Text } from '../../src/node/node';
+import { Document, Header, Link, Paragraph, Text } from '../../src/node/node';
 import { Parser } from '../../src/parser/parser';
 
 describe('parser', () => {
@@ -9,88 +9,6 @@ describe('parser', () => {
             const document = parseDocument(input);
 
             expect(document.lines.length).toBe(0);
-        });
-    });
-
-    describe('text only simple documents', () => {
-        it('should parse header', () => {
-            const input = '## this is header';
-            const document = parseDocument(input);
-
-            expect(document.lines.length).toBe(1);
-
-            const line = document.lines[0];
-
-            expect(line.nodeType).toBe('HEADER');
-            expect((line as Header).numHashes).toBe(2);
-            expect(line.inlines.length).toBe(1);
-            expect(line.inlines[0].nodeType).toBe('TEXT');
-            expect((line.inlines[0] as Text).text).toBe('this is header');
-        });
-
-        it('should parse paragraph with single line', () => {
-            const input = `single line`;
-            const document = parseDocument(input);
-
-            expect(document.lines.length).toBe(1);
-
-            const line = document.lines[0];
-
-            expect(line.nodeType).toBe('PARAGRAPH');
-            expect(line.inlines.length).toBe(1);
-            expect(line.inlines[0].nodeType).toBe('TEXT');
-            expect((line.inlines[0] as Text).text).toBe('single line');
-        });
-
-        it('should parse paragraph with multiple lines', () => {
-            const input = `
-first line
-
-second line
-`;
-            const document = parseDocument(input);
-
-            expect(document.lines.length).toBe(2);
-
-            const line1 = document.lines[0];
-
-            expect(line1.nodeType).toBe('PARAGRAPH');
-            expect(line1.inlines.length).toBe(1);
-            expect(line1.inlines[0].nodeType).toBe('TEXT');
-            expect((line1.inlines[0] as Text).text).toBe('first line');
-
-            const line2 = document.lines[1];
-
-            expect(line2.nodeType).toBe('PARAGRAPH');
-            expect(line2.inlines.length).toBe(1);
-            expect(line2.inlines[0].nodeType).toBe('TEXT');
-            expect((line2.inlines[0] as Text).text).toBe('second line');
-        });
-
-        it('should parse mix of header and paragraph', () => {
-            const input = `
-### header
-
-paragraph
-`;
-            const document = parseDocument(input);
-
-            expect(document.lines.length).toBe(2);
-
-            const header = document.lines[0];
-
-            expect(header.nodeType).toBe('HEADER');
-            expect((header as Header).numHashes).toBe(3);
-            expect(header.inlines.length).toBe(1);
-            expect(header.inlines[0].nodeType).toBe('TEXT');
-            expect((header.inlines[0] as Text).text).toBe('header');
-
-            const line = document.lines[1];
-
-            expect(line.nodeType).toBe('PARAGRAPH');
-            expect(line.inlines.length).toBe(1);
-            expect(line.inlines[0].nodeType).toBe('TEXT');
-            expect((line.inlines[0] as Text).text).toBe('paragraph');
         });
     });
 
@@ -127,6 +45,88 @@ paragraph
             expect(link.inlines[1].nodeType).toBe('LINK');
             expect((link.inlines[1] as Link).text).toBe('here');
             expect((link.inlines[1] as Link).href).toBe('http://example.com');
+        });
+    });
+
+    describe('header', () => {
+        it('should parse header', () => {
+            const input = '## this is header';
+            const document = parseDocument(input);
+
+            expect(document.lines.length).toBe(1);
+
+            const header = document.lines[0] as Header;
+
+            expect(header.numHashes).toBe(2);
+            expect(document.lines[0].inlines.length).toBe(1);
+
+            expect(document.lines[0].inlines[0].nodeType).toBe('TEXT');
+            expect((document.lines[0].inlines[0] as Text).text).toBe('this is header');
+        });
+
+        it('should parse mix of header and paragraph', () => {
+            const input = `### header
+
+paragraph
+`;
+            const document = parseDocument(input);
+
+            expect(document.lines.length).toBe(3);
+
+            const header = document.lines[0] as Header;
+            const headerText = header.inlines[0] as Text;
+            expect(headerText.text).toBe('header');
+
+            const paragraph = document.lines[2] as Header;
+            const paragraphText = paragraph.inlines[0] as Text;
+            expect(paragraphText.text).toBe('paragraph');
+        });
+
+        it('should parse header including hashes', () => {
+            const input = `#### ## header ##`;
+            const document = parseDocument(input);
+
+            expect(document.lines.length).toBe(1);
+
+            const header = document.lines[0] as Header;
+            expect(header.numHashes).toBe(4);
+
+            const inlines = header.inlines;
+            expect(inlines.length).toBe(1);
+            expect(inlines[0].text).toBe('## header ##');
+        });
+    });
+
+    describe('paragraph', () => {
+        it('should parse paragraph with single line', () => {
+            const input = `single line`;
+            const document = parseDocument(input);
+
+            expect(document.lines.length).toBe(1);
+
+            const line = document.lines[0];
+
+            expect(line.nodeType).toBe('PARAGRAPH');
+            expect(line.inlines.length).toBe(1);
+            expect(line.inlines[0].nodeType).toBe('TEXT');
+            expect((line.inlines[0] as Text).text).toBe('single line');
+        });
+
+        it('should parse paragraph with multiple lines', () => {
+            const input = `first line
+
+second line`;
+            const document = parseDocument(input);
+
+            expect(document.lines.length).toBe(3);
+
+            const line1 = document.lines[0] as Paragraph;
+            const text1 = line1.inlines[0] as Text;
+            expect(text1.text).toBe('first line');
+
+            const line2 = document.lines[2] as Paragraph;
+            const text2 = line2.inlines[0] as Text;
+            expect(text2.text).toBe('second line');
         });
     });
 });

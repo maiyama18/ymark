@@ -142,6 +142,7 @@ good bye`;
                 new Token('NEWLINE', '\n'),
                 new Token('MINUS', '-'),
                 new Token('LETTERS', ' first'),
+                new Token('NEWLINE', '\n'),
                 new Token('MINUS', '-'),
                 new Token('LETTERS', ' second'),
                 new Token('NEWLINE', '\n'),

@@ -5,8 +5,12 @@ export class Document {
     public readonly nodeType = 'DOCUMENT';
     public lines: Line[];
 
-    constructor(lines?: Line[]) {
-        this.lines = lines || [];
+    constructor(lines: Line[] = []) {
+        this.lines = lines;
+    }
+
+    public addLine(line: Line): void {
+        this.lines.push(line);
     }
 }
 
@@ -17,8 +21,12 @@ export class Paragraph {
     public readonly nodeType = 'PARAGRAPH';
     public inlines: Inline[];
 
-    constructor(inlines?: Inline[]) {
-        this.inlines = inlines || [];
+    constructor(inlines: Inline[] = []) {
+        this.inlines = inlines;
+    }
+
+    public addInline(inline: Inline): void {
+        this.inlines.push(inline);
     }
 }
 
@@ -27,9 +35,13 @@ export class Header {
     public numHashes: number;
     public inlines: Inline[];
 
-    constructor(numHashes: number, inlines?: Inline[]) {
+    constructor(numHashes: number, inlines: Inline[] = []) {
         this.numHashes = numHashes;
-        this.inlines = inlines || [];
+        this.inlines = inlines;
+    }
+
+    public addInline(inline: Inline): void {
+        this.inlines.push(inline);
     }
 }
 
@@ -40,8 +52,8 @@ export class Text {
     public readonly nodeType = 'TEXT';
     public text: string;
 
-    constructor(text?: string) {
-        this.text = text || '';
+    constructor(text: string = '') {
+        this.text = text;
     }
 
     public html(): string {
@@ -54,9 +66,9 @@ export class Link {
     public text: string;
     public href: string;
 
-    constructor(text?: string, href?: string) {
-        this.text = text || '';
-        this.href = href || '';
+    constructor(text: string = '', href: string = '') {
+        this.text = text;
+        this.href = href;
     }
 
     public html(): string {

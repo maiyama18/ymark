@@ -22,7 +22,7 @@ export class Parser {
 
         while (!this.isCurrentTokenType('EOF')) {
             const line = this.parseLine();
-            document.lines.push(line);
+            document.addLine(line);
 
             this.consumeToken();
         }
@@ -37,6 +37,10 @@ export class Parser {
 
     private isCurrentTokenType(tokenType: TokenType): boolean {
         return this.currentToken.tokenType === tokenType;
+    }
+
+    private isPeekTokenType(tokenType: TokenType): boolean {
+        return this.peekToken.tokenType === tokenType;
     }
 
     private parseLine(): Line {
@@ -59,9 +63,10 @@ export class Parser {
         const header = new Header(numHashes);
 
         this.consumeToken();
+        let count = 0;
         while (!this.isCurrentTokenType('NEWLINE') && !this.isCurrentTokenType('EOF')) {
-            const inline = this.parseInline();
-            header.inlines.push(inline);
+            const inline = this.parseInline(count++);
+            header.addInline(inline);
 
             this.consumeToken();
         }
@@ -72,9 +77,10 @@ export class Parser {
     private parseParagraphLine(): Paragraph {
         const paragraph = new Paragraph();
 
+        let count = 0;
         while (!this.isCurrentTokenType('NEWLINE') && !this.isCurrentTokenType('EOF')) {
-            const inline = this.parseInline();
-            paragraph.inlines.push(inline);
+            const inline = this.parseInline(count++);
+            paragraph.addInline(inline);
 
             this.consumeToken();
         }
@@ -82,12 +88,26 @@ export class Parser {
         return paragraph;
     }
 
-    private parseInline(): Inline {
+    private parseInline(count: number): Inline {
+        // remove spaces if this is the first inline element of line
+        if (count === 0) {
+            this.currentToken.literal = this.currentToken.literal.replace(/^\s*/, '');
+        }
+
         switch (this.currentToken.tokenType) {
             case 'LBRACKET':
                 return this.parseLink();
             default:
-                return new Text(this.currentToken.literal);
+                let text = this.currentToken.literal;
+                while (
+                    !this.isPeekTokenType('LBRACKET') &&
+                    !this.isPeekTokenType('NEWLINE') &&
+                    !this.isPeekTokenType('EOF')
+                ) {
+                    this.consumeToken();
+                    text += this.currentToken.literal;
+                }
+                return new Text(text);
         }
     }
 
@@ -96,7 +116,7 @@ export class Parser {
 
         this.consumeToken();
         literal += this.currentToken.literal;
-        if (!this.isCurrentTokenType('TEXT')) {
+        if (!this.isCurrentTokenType('LETTERS')) {
             return new Text(literal);
         }
         const text = this.currentToken.literal;
@@ -115,7 +135,7 @@ export class Parser {
 
         this.consumeToken();
         literal += this.currentToken.literal;
-        if (!this.isCurrentTokenType('TEXT')) {
+        if (!this.isCurrentTokenType('LETTERS')) {
             return new Text(literal);
         }
         const href = this.currentToken.literal;
