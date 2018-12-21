@@ -1,5 +1,5 @@
 import { Lexer } from '../../src/lexer/lexer';
-import { Document, Header, Link, Paragraph, Text } from '../../src/node/node';
+import { Document, Header, Link, List, Paragraph, Text } from '../../src/node/node';
 import { Parser } from '../../src/parser/parser';
 
 describe('parser', () => {
@@ -145,6 +145,44 @@ second line`;
             const line2 = document.lines[2] as Paragraph;
             const text2 = line2.inlines[0] as Text;
             expect(text2.text).toBe('second line');
+        });
+    });
+
+    describe('lists', () => {
+        it('should parse list with single element', () => {
+            const input = `- item1`;
+            const document = parseDocument(input);
+
+            expect(document.lines.length).toBe(1);
+
+            const item = document.lines[0] as List;
+            expect(item.isFirst).toBe(true);
+            expect(item.isLast).toBe(true);
+
+            const inlines = item.inlines;
+            expect(inlines.length).toBe(1);
+            expect(inlines[0].text).toBe('item1');
+        });
+
+        it('should parse list with multiple element', () => {
+            const input = `- item1
+- item2
+- item3`;
+            const document = parseDocument(input);
+
+            expect(document.lines.length).toBe(3);
+
+            const item1 = document.lines[0] as List;
+            expect(item1.isFirst).toBe(true);
+            expect(item1.isLast).toBe(false);
+
+            const item2 = document.lines[1] as List;
+            expect(item2.isFirst).toBe(false);
+            expect(item2.isLast).toBe(false);
+
+            const item3 = document.lines[2] as List;
+            expect(item3.isFirst).toBe(false);
+            expect(item3.isLast).toBe(true);
         });
     });
 });

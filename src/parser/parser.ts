@@ -1,14 +1,16 @@
 import { Lexer } from '../lexer/lexer';
-import { Document, Header, Inline, Line, Link, Paragraph, Text } from '../node/node';
+import { Document, Header, Inline, Line, Link, List, Paragraph, Text } from '../node/node';
 import { Token, TokenType } from '../token/token';
 
 export class Parser {
     public lexer: Lexer;
     private currentToken: Token;
     private peekToken: Token;
+    private document: Document;
 
     constructor(lexer: Lexer) {
         this.lexer = lexer;
+        this.document = new Document();
 
         const firstToken = lexer.nextToken();
         this.currentToken = firstToken;
@@ -18,16 +20,14 @@ export class Parser {
     }
 
     public parseDocument(): Document {
-        const document = new Document();
-
         while (!this.isCurrentTokenType('EOF')) {
             const line = this.parseLine();
-            document.addLine(line);
+            this.document.addLine(line);
 
             this.consumeToken();
         }
 
-        return document;
+        return this.document;
     }
 
     private consumeToken(): void {
@@ -43,6 +43,13 @@ export class Parser {
         return this.peekToken.tokenType === tokenType;
     }
 
+    private lastLine(): Line | null {
+        if (this.document.lines.length === 0) {
+            return null;
+        }
+        return this.document.lines.slice(-1)[0];
+    }
+
     private parseLine(): Line {
         switch (this.currentToken.tokenType) {
             case 'HASHES1':
@@ -52,6 +59,8 @@ export class Parser {
             case 'HASHES5':
             case 'HASHES6':
                 return this.parseHeaderLine();
+            case 'MINUS':
+                return this.parseListLine();
             default:
                 return this.parseParagraphLine();
         }
@@ -72,6 +81,27 @@ export class Parser {
         }
 
         return header;
+    }
+
+    private parseListLine(): List {
+        const list = new List();
+
+        const lastLine = this.lastLine();
+        list.isFirst = lastLine === null || lastLine.nodeType !== 'LIST';
+
+        this.consumeToken();
+        let count = 0;
+        while (!this.isCurrentTokenType('NEWLINE') && !this.isCurrentTokenType('EOF')) {
+            const inline = this.parseInline(count++);
+            list.addInline(inline);
+
+            this.consumeToken();
+        }
+        if (this.isCurrentTokenType('EOF') || !this.isPeekTokenType('MINUS')) {
+            list.isLast = true;
+        }
+
+        return list;
     }
 
     private parseParagraphLine(): Paragraph {

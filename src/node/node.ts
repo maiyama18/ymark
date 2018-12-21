@@ -15,7 +15,7 @@ export class Document {
 }
 
 // Line nodes
-export type Line = Paragraph | Header;
+export type Line = Paragraph | Header | List;
 
 export class Paragraph {
     public readonly nodeType = 'PARAGRAPH';
@@ -37,6 +37,23 @@ export class Header {
 
     constructor(numHashes: number, inlines: Inline[] = []) {
         this.numHashes = numHashes;
+        this.inlines = inlines;
+    }
+
+    public addInline(inline: Inline): void {
+        this.inlines.push(inline);
+    }
+}
+
+export class List {
+    public readonly nodeType = 'LIST';
+    public isFirst: boolean;
+    public isLast: boolean;
+    public inlines: Inline[];
+
+    constructor(isFirst: boolean = false, isLast: boolean = false, inlines: Inline[] = []) {
+        this.isFirst = isFirst;
+        this.isLast = isLast;
         this.inlines = inlines;
     }
 
